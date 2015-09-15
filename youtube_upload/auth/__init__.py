@@ -10,11 +10,6 @@ import lib
 from auth import console
 from auth import browser
 
-"""
-from youtube_upload import lib
-from youtube_upload.auth import console
-from youtube_upload.auth import browser
-"""
 
 YOUTUBE_UPLOAD_SCOPE = ["https://www.googleapis.com/auth/youtube.upload", "https://www.googleapis.com/auth/youtube"]
 
