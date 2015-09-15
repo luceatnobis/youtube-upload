@@ -1,4 +1,4 @@
-from .. import lib
+import lib
 
 try:
     from youtube_upload.auth import webkit_qt as backend

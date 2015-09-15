@@ -7,7 +7,7 @@ import googleapiclient.errors
 import apiclient.http
 import httplib2
 
-from . import lib
+import lib
 
 RETRIABLE_EXCEPTIONS = [
     IOError, httplib2.HttpLib2Error, httplib.NotConnected,
