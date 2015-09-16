@@ -16,6 +16,7 @@ RETRIABLE_EXCEPTIONS = [
     httplib.ResponseNotReady, httplib.BadStatusLine,
 ]
 
+
 def _upload_to_request(request, progress_callback):
     """Upload a video to a Youtube request. Return video ID."""
     while 1:
@@ -28,13 +29,19 @@ def _upload_to_request(request, progress_callback):
         elif status and progress_callback:
             progress_callback(status.total_size, status.resumable_progress)
 
-def upload(resource, path, body, chunksize=1024*1024, 
-        progress_callback=None, max_retries=10):
+
+def upload(resource, path, body, chunksize=1024*1024,
+           progress_callback=None, max_retries=10):
     """Upload video to Youtube. Return video ID."""
     body_keys = ",".join(body.keys())
-    media = apiclient.http.MediaFileUpload(path, chunksize=chunksize, 
-        resumable=True, mimetype="application/octet-stream")
-    request = resource.videos().insert(part=body_keys, body=body, media_body=media)
+
+    media = apiclient.http.MediaFileUpload(
+        path, chunksize=chunksize, resumable=True,
+        mimetype="application/octet-stream"
+    )
+
+    request = resource.videos().insert(
+        part=body_keys, body=body, media_body=media)
     upload_fun = lambda: _upload_to_request(request, progress_callback)
-    return lib.retriable_exceptions(upload_fun, 
-        RETRIABLE_EXCEPTIONS, max_retries=max_retries)
+    return lib.retriable_exceptions(
+        upload_fun, RETRIABLE_EXCEPTIONS, max_retries=max_retries)

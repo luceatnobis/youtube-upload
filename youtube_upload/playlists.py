@@ -1,5 +1,6 @@
 from lib import debug
 
+
 def get_playlist(youtube, title):
     """Return users's playlist ID by title (None if not found)"""
     playlists = youtube.playlists()
@@ -10,6 +11,7 @@ def get_playlist(youtube, title):
             if item.get("snippet", {}).get("title") == title:
                 return item.get("id")
         request = playlists.list_next(request, results)
+
 
 def create_playlist(youtube, title, privacy):
     """Create a playlist by title and return its ID"""
@@ -24,6 +26,7 @@ def create_playlist(youtube, title, privacy):
     }).execute()
     return response.get("id")
 
+
 def add_video_to_existing_playlist(youtube, playlist_id, video_id):
     """Add video to playlist (by identifier) and return the playlist ID."""
     debug("Adding video to playlist: {0}".format(playlist_id))
@@ -36,7 +39,8 @@ def add_video_to_existing_playlist(youtube, playlist_id, video_id):
             }
         }
     }).execute()
-    
+
+
 def add_video_to_playlist(youtube, video_id, title, privacy="public"):
     """Add video to playlist (by title) and return the full response."""
     playlist_id = get_playlist(youtube, title) or \
