@@ -150,12 +150,15 @@ def upload_youtube_video(youtube, options, video_path, total_videos, index):
 
 def get_youtube_handler(options):
     """Return the API Youtube object."""
+    cs_name = "client_secrets.json"
+    cred_name = ".youtube-upload-credentials.json"
     home = os.path.expanduser("~")
-    default_client_secrets = lib.get_first_existing_filename(
-        [sys.prefix, os.path.join(sys.prefix, "local")],
-        "share/youtube_upload/client_secrets.json")
+    default_client_secrets = lib.get_standard_filename(cs_name)
+    default_credentials = lib.get_standard_filename(cred_name)
+    """
     default_credentials = os.path.join(
         home, ".youtube-upload-credentials.json")
+    """
     client_secrets = options.client_secrets or default_client_secrets or \
         os.path.join(home, ".client_secrets.json")
     credentials = options.credentials_file or default_credentials
@@ -216,8 +219,6 @@ def insert_into_playlist(args):
     youtube = get_youtube_handler(args)
 
     res = playlists.get_playlist(youtube, "test")
-    import pdb
-    pdb.set_trace()
     return
     
     try:

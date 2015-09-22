@@ -83,6 +83,7 @@ def string_to_dict(string):
 
 
 def get_first_existing_filename(prefixes, relative_path):
+    import pdb
     """Get the first existing filename of """
     """relative path seeking on prefixes directories."""
     for prefix in prefixes:
@@ -90,6 +91,18 @@ def get_first_existing_filename(prefixes, relative_path):
         if os.path.exists(path):
             return path
 
+def get_standard_filename(fname):
+    filenames = [
+        os.path.join(os.getcwd(), fname),
+        os.path.join(os.path.expanduser("~"), fname)
+    ]
+    for x in filenames:
+        if not os.path.exists(x):
+            continue
+        return x
+    return get_first_existing_filename(
+        [sys.prefix, os.path.join(sys.prefix, "local")],
+        "share/youtube_upload/client_secrets.json")
 
 def retriable_exceptions(fun, retriable_exceptions, max_retries=None):
     """Run function and retry on some exceptions (with exponential backoff)."""
