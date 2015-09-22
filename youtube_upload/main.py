@@ -15,11 +15,14 @@ Upload a video to Youtube from the command-line.
     pxzZ-fYjeYs
 """
 
+from __future__ import print_function
+
 import os
 import sys
 import argparse
 import collections
 import webbrowser
+
 
 import apiclient.errors
 import oauth2client
@@ -204,6 +207,25 @@ def run_main(parser, options, args, output=sys.stdout):
     else:
         raise ex.AuthenticationError("Cannot get youtube resource")
 
+def insert_into_playlist(args):
+    collection = list()
+    for e in args.vid:
+        collection.extend(lib.extract_vid_from_cli(e))
+    for f in args.vfile:
+        collection.extend(lib.extract_vid_from_file(f))
+    youtube = get_youtube_handler(args)
+
+    res = playlists.get_playlist(youtube, "test")
+    import pdb
+    pdb.set_trace()
+    return
+    
+    try:
+        for f in collection:
+            resp = playlists.add_video_to_playlist(
+                youtube, f, "test", "private")
+    except:
+        print(f)
 
 def main(arguments):
     """Upload videos to Youtube."""
@@ -211,46 +233,17 @@ def main(arguments):
 
     Upload videos to Youtube."""
     parser = argparse.ArgumentParser(usage=usage)
+    subparsers = parser.add_subparsers(dest="subparser_name")
 
-    # Video metadata
-    parser.add_argument("video_file", nargs=1)
-    parser.add_argument(
-        '-t', '--title', dest='title', help='Video title', required=True
+    upload_parser = subparsers.add_parser('upload')
+
+    playlist_parser = subparsers.add_parser('playlist')
+    playlist_subparsers = playlist_parser.add_subparsers(
+        dest="playlist_subparser"
     )
-    parser.add_argument(
-        '-c', '--category', dest='category', help='Video category'
-    )
-    parser.add_argument(
-        '-d', '--description', dest='description',  help='Video description'
-    )
-    parser.add_argument(
-        '--tags', dest='tags',
-        help='Video tags (separated by commas: tag1, tag2,...'
-    )
-    parser.add_argument(
-        '--privacy', dest='privacy', metavar="STRING", default="public",
-        help='Privacy status (public | unlisted | private)'
-    )
-    parser.add_argument(
-        '--publish-at', dest='publish_at', metavar="datetime", default=None,
-        help='Publish Date: YYYY-MM-DDThh:mm:ss.sZ'
-    )
-    parser.add_argument(
-        '--location', dest='location', default=None, help='Video location"',
-        metavar="latitude=VAL,longitude=VAL[,altitude=VAL]"
-    )
-    parser.add_argument(
-        '--thumbnail', dest='thumb', help='Video thumbnail'
-    )
-    parser.add_argument(
-        '--playlist', dest='playlist',
-        help='Playlist title (if it does not exist, it will be created)'
-    )
-    parser.add_argument(
-        '--title-template', dest='title_template', metavar="STRING",
-        default="{title} [{n}/{total}]",
-        help='Template for multiple videos (default: {title} [{n}/{total}])'
-    )
+
+    playlist_create_subparser = playlist_subparsers.add_parser('create')
+    playlist_insert_subparser = playlist_subparsers.add_parser('insert')
 
     # Authentication
     parser.add_argument(
@@ -272,9 +265,67 @@ def main(arguments):
         help='Opens a url in a web browser to display uploaded videos'
     )
 
+    # Video metadata
+    upload_parser.add_argument("video_file", nargs=1)
+    upload_parser.add_argument(
+        '-t', '--title', dest='title', help='Video title', required=True
+    )
+    upload_parser.add_argument(
+        '-c', '--category', dest='category', help='Video category'
+    )
+    upload_parser.add_argument(
+        '-d', '--description', dest='description',  help='Video description'
+    )
+    upload_parser.add_argument(
+        '--tags', dest='tags',
+        help='Video tags (separated by commas: tag1, tag2,...'
+    )
+    upload_parser.add_argument(
+        '--privacy', dest='privacy', metavar="STRING", default="public",
+        help='Privacy status (public | unlisted | private)'
+    )
+    upload_parser.add_argument(
+        '--publish-at', dest='publish_at', metavar="datetime", default=None,
+        help='Publish Date: YYYY-MM-DDThh:mm:ss.sZ'
+    )
+    upload_parser.add_argument(
+        '--location', dest='location', default=None, help='Video location"',
+        metavar="latitude=VAL,longitude=VAL[,altitude=VAL]"
+    )
+    upload_parser.add_argument(
+        '--thumbnail', dest='thumb', help='Video thumbnail'
+    )
+    upload_parser.add_argument(
+        '--playlist', dest='playlist',
+        help='Playlist title (if it does not exist, it will be created)'
+    )
+    upload_parser.add_argument(
+        '--title-template', dest='title_template', metavar="STRING",
+        default="{title} [{n}/{total}]",
+        help='Template for multiple videos (default: {title} [{n}/{total}])'
+    )
+
+
+    playlist_insert_subparser.add_argument(
+        "-p", "--playlist", dest="playlist_id", required=True
+    )
+    playlist_insert_subparser.add_argument(
+        "-v", "--video", dest="vid", action="append",
+        metavar="video_id", default=[]
+    )
+    playlist_insert_subparser.add_argument(
+        "-f", "--file", dest="vfile", metavar="video_id file",
+        action="append", default=[]
+    )
+
     args = parser.parse_args()
-    # run_main(parser, options, args)
-    run_main(parser, args, args.video_file)
+    if args.subparser_name == "upload":
+        run_main(parser, args, args.video_file)
+    elif args.subparser_name == "playlist":
+        if args.playlist_subparser == "create":
+            pass
+        elif args.playlist_subparser == "insert":
+            insert_into_playlist(args)
 
 
 def run():

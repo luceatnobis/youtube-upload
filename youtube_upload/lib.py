@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import re
 import os
 import sys
 import locale
@@ -8,6 +9,15 @@ import time
 import signal
 from contextlib import contextmanager
 
+from string import (
+    ascii_letters as al,
+    digits as dig
+)
+
+try:  # python3
+    from urllib.parse import urlparse, parse_qs
+except ImportError:  # python2
+    from urlparse import urlparse, parse_qs
 
 @contextmanager
 def default_sigint():
@@ -108,3 +118,42 @@ def retriable_exceptions(fun, retriable_exceptions, max_retries=None):
                 )
                 debug(message)
                 time.sleep(seconds)
+
+def extract_vid_from_file(f):
+    collection = list()
+    try:
+        c = open(f)
+        lines = [x.rstrip() for x in c.readlines()]
+        c.close()
+    except IOError:
+        print(
+            "Could not open \"%s\"; skipping" % f, file=sys.stderr)
+        return
+    for l in lines:
+        v = filter_vid(l)
+        if not v:
+            continue
+        collection.append(v)
+    return collection
+
+def filter_vid(line):
+    p = urlparse(line)
+    if p.scheme:
+        v = parse_qs(p.query)
+        if not 'v' in v:
+            return False
+        vid = v['v'][0]
+    else:
+        vid = line
+    return vid if check_valid_id(vid) else None
+
+def extract_vid_from_cli(vid, delimiters=[',', ', '], extra_delim=[]):
+    ids = list()
+    ids.extend(re.split('|'.join(delimiters + extra_delim), vid))
+    return ids
+
+def check_valid_id(vid):
+    vid_chars = set(al + dig + "".join(["-", "_"]))
+    s = set(list(vid))
+    # checks if all chars of vid are allowed
+    return len(vid) == 11 and s & vid_chars == s
