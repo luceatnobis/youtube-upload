@@ -151,14 +151,11 @@ def upload_youtube_video(youtube, options, video_path, total_videos, index):
 def get_youtube_handler(options):
     """Return the API Youtube object."""
     cs_name = "client_secrets.json"
-    cred_name = ".youtube-upload-credentials.json"
+    cred_name = "youtube-upload-credentials.json"
     home = os.path.expanduser("~")
     default_client_secrets = lib.get_standard_filename(cs_name)
-    default_credentials = lib.get_standard_filename(cred_name)
-    """
-    default_credentials = os.path.join(
-        home, ".youtube-upload-credentials.json")
-    """
+    default_credentials = os.path.join(os.path.dirname(default_client_secrets),
+        cred_name)
     client_secrets = options.client_secrets or default_client_secrets or \
         os.path.join(home, ".client_secrets.json")
     credentials = options.credentials_file or default_credentials
