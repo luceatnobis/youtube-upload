@@ -7,7 +7,11 @@ import googleapiclient.errors
 import apiclient.http
 import httplib2
 
-import lib
+try:
+    from youtube_upload.lib import retriable_exception
+except ImportError:
+    from lib import retriable_exceptions
+
 
 RETRIABLE_EXCEPTIONS = [
     IOError, httplib2.HttpLib2Error, httplib.NotConnected,
@@ -43,5 +47,5 @@ def upload(resource, path, body, chunksize=1024*1024,
     request = resource.videos().insert(
         part=body_keys, body=body, media_body=media)
     upload_fun = lambda: _upload_to_request(request, progress_callback)
-    return lib.retriable_exceptions(
+    return retriable_exceptions(
         upload_fun, RETRIABLE_EXCEPTIONS, max_retries=max_retries)
