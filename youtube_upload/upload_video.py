@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 try:
     import httplib
 except ImportError:
@@ -10,7 +8,7 @@ import apiclient.http
 import httplib2
 
 try:
-    from youtube_upload.lib import retriable_exception
+    from youtube_upload.lib import retriable_exceptions
 except ImportError:
     from lib import retriable_exceptions
 
