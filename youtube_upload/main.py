@@ -27,12 +27,21 @@ import webbrowser
 import apiclient.errors
 import oauth2client
 
-import lib
-import auth
-import playlists
-import categories
-import upload_video
-import yu_exceptions as ex
+try:
+    import lib
+    import auth
+    import playlists
+    import categories
+    import upload_video
+    import yu_exceptions as ex
+except ImportError:
+    from . import lib
+    from . import auth
+    from . import playlists
+    from . import categories
+    from . import upload_video
+    from . import yu_exceptions as ex
+
 
 # http://code.google.com/p/python-progressbar (>= 2.3)
 try:

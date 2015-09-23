@@ -6,9 +6,13 @@ import googleapiclient.discovery
 import oauth2client
 import httplib2
 
-import lib
-from auth import console
-from auth import browser
+try:
+    import lib
+except ImportError:
+    from .. import lib
+
+from . import console
+from . import browser
 
 
 YOUTUBE_UPLOAD_SCOPE = [

@@ -1,4 +1,7 @@
-from lib import debug
+try:
+    from lib import debug
+except ImportError:
+    from youtube_upload.lib import debug
 
 
 def get_playlist(youtube, title):
